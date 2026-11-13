@@ -1,0 +1,14 @@
+# Build output (attach these to GitHub Releases instead)
+*.exe
+*.syso
+dist/
+# Generated during the build
+rsrc_windows_amd64.syso
+# Per-user data of a running copy of Lumistar
+settings.txt
+crash.log
+# Editor and OS files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

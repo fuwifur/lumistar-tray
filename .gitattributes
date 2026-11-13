@@ -1,0 +1,7 @@
+* text=auto
+*.raw binary
+*.ico binary
+*.png binary
+*.exe binary
+*.nsi text eol=crlf
+README_body.txt text eol=crlf
