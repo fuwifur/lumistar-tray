@@ -1,6 +1,13 @@
 # Changelog
 
-## v0.1.0
+## Unreleased
+
+- Maintenance: all GitHub Actions moved to current major versions that run on Node 24 (checkout v7, setup-go v7, upload-artifact v7, action-gh-release v3, CodeQL v4).
+- Build: `go.sum` added so the Go module cache works (the project has no external modules).
+- CodeQL: explicit workflow (`codeql.yml`) that analyses Go on a Windows runner, because the Go sources are Windows-only.
+- Dependabot keeps the GitHub Actions versions up to date weekly.
+
+## v1.0.0
 
 First public release.
 
