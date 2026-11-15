@@ -8,13 +8,16 @@ package main
 
 import (
 	"encoding/binary"
+	"fmt"
+	"os"
+	"path/filepath"
 	"runtime"
-	"syscall"
+	"time"
 	"unsafe"
 )
 
 var (
-	oleaut32         = syscall.NewLazyDLL("oleaut32.dll")
+	oleaut32         = sysDLL("oleaut32.dll")
 	pSysAllocString  = oleaut32.NewProc("SysAllocString")
 	pSysFreeString   = oleaut32.NewProc("SysFreeString")
 	pVariantClear    = oleaut32.NewProc("VariantClear")
@@ -113,7 +116,8 @@ func wbemConnect() bool {
 	}
 	var loc uintptr
 	// CoCreateInstance(CLSID_WbemLocator, nil, CLSCTX_INPROC_SERVER, IID_IWbemLocator, &loc)
-	if int32(call(pCoCreate, ptr(&clsidWbemLocator), 0, 1, ptr(&iidWbemLocator), ptr(&loc))) < 0 || loc == 0 {
+	if hr := int32(call(pCoCreate, ptr(&clsidWbemLocator), 0, 1, ptr(&iidWbemLocator), ptr(&loc))); hr < 0 || loc == 0 {
+		brightLog(fmt.Sprintf("CoCreateInstance(WbemLocator) failed: 0x%08X", uint32(hr)))
 		wbem.failed = true
 		return false
 	}
@@ -124,6 +128,7 @@ func wbemConnect() bool {
 	bstrFree(ns)
 	vcall(loc, 2) // Release
 	if int32(hr) < 0 || svc == 0 {
+		brightLog(fmt.Sprintf("ConnectServer(ROOT\\WMI) failed: 0x%08X", uint32(hr)))
 		wbem.failed = true
 		return false
 	}
@@ -142,6 +147,7 @@ func wbemFirst(query string) uintptr {
 	bstrFree(lang)
 	bstrFree(q)
 	if int32(hr) < 0 || en == 0 {
+		brightLog(fmt.Sprintf("ExecQuery failed (%s): 0x%08X", query, uint32(hr)))
 		return 0
 	}
 	var obj uintptr
@@ -150,6 +156,7 @@ func wbemFirst(query string) uintptr {
 	hr = vcall(en, 4, 0xFFFFFFFF, 1, ptr(&obj), ptr(&got))
 	vcall(en, 2) // Release
 	if int32(hr) < 0 || got == 0 || obj == 0 {
+		brightLog(fmt.Sprintf("no instance returned for: %s", query))
 		return 0
 	}
 	return obj
@@ -233,5 +240,20 @@ func wbemWriteBrightness(level int) bool {
 	runtime.KeepAlive(bn)
 	// IWbemServices::ExecMethod(objectPath, methodName, flags, ctx, inParams, &outParams, &callResult)
 	hr = vcall(wbem.svc, 24, wbem.path, method, 0, 0, in, 0, 0)
-	return int32(hr) >= 0
+	if int32(hr) < 0 {
+		brightLog(fmt.Sprintf("WmiSetBrightness failed: 0x%08X", uint32(hr)))
+		return false
+	}
+	return true
+}
+
+// brightLog appends one line to brightness.log in the Lumistar data folder, so a failing laptop panel can be diagnosed.
+func brightLog(msg string) {
+	os.MkdirAll(dataDir(), 0o755)
+	f, err := os.OpenFile(filepath.Join(dataDir(), "brightness.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	fmt.Fprintf(f, "%s  %s\n", time.Now().Format("2006-01-02 15:04:05"), msg)
 }

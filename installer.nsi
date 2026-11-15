@@ -16,7 +16,7 @@ ShowInstDetails nevershow
 !insertmacro GetOptions
 
 !define APPNAME "Lumistar"
-!define VERSION "0.1.0"
+!define VERSION "1.1.4"
 !define UNKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Lumistar"
 !define RUNKEY "Software\Microsoft\Windows\CurrentVersion\Run"
 
@@ -116,7 +116,7 @@ Function OnCustom
 FunctionEnd
 
 Function LocationPage
-  !insertmacro MUI_HEADER_TEXT "Choose install location" "The program goes into the Lumistar folder below. Its settings are always kept in $LOCALAPPDATA\Lumistar."
+  !insertmacro MUI_HEADER_TEXT "Choose install location" "The program goes into the Lumistar folder below. Its settings are always kept in $PROFILE\AppData\LocalLow\fuwifur\Lumistar."
   nsDialogs::Create 1018
   Pop $0
 
@@ -283,7 +283,7 @@ Section "Uninstall"
   Delete "$DESKTOP\Lumistar.lnk"
   DeleteRegKey HKCU "${UNKEY}"
   DeleteRegValue HKCU "${RUNKEY}" "Lumistar"
-  RMDir /r "$LOCALAPPDATA\Lumistar"
+  RMDir /r "$PROFILE\AppData\LocalLow\fuwifur\Lumistar"
   ; Only ever remove a folder that is really named "Lumistar".
   StrCpy $0 "$INSTDIR" 9 -9
   ${If} $0 == "\Lumistar"

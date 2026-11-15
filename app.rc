@@ -1,4 +1,7 @@
 1 ICON "setup.ico"
+2 ICON "tray_bfw.ico"
+3 ICON "tray_wfb.ico"
+4 ICON "tray_bl.ico"
 1 24 "app.manifest"
 
 1 VERSIONINFO
@@ -16,12 +19,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "fuwifur"
             VALUE "FileDescription", "Lumistar - tray brightness, volume and screen control"
-            VALUE "FileVersion", "0.1.0.0"
+            VALUE "FileVersion", "1.1.4.0"
             VALUE "InternalName", "Lumistar"
             VALUE "LegalCopyright", "Copyright (c) 2026 fuwifur. MIT License."
             VALUE "OriginalFilename", "Lumistar.exe"
             VALUE "ProductName", "Lumistar"
-            VALUE "ProductVersion", "0.1.0"
+            VALUE "ProductVersion", "1.1.4"
         END
     END
     BLOCK "VarFileInfo"
