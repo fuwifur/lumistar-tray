@@ -25,7 +25,7 @@ Use this file to pick up the project in any AI tool or by hand. Read it first, t
 
 ## Build
 - Windows: `powershell -ExecutionPolicy Bypass -File build.ps1` (needs Go, NSIS, MinGW `windres`).
-- Linux cross-build: `./build.sh` (needs `golang`, `nsis`, MinGW binutils). This is how 1.1.3 was built during development.
+- Linux cross-build: `./build.sh` (needs `golang`, `nsis`, MinGW binutils). This is how 1.1.4 was built during development.
 - CI: `.github/workflows/build.yml` runs on `v*` tags and uploads the release files.
 
 ## Source map
@@ -38,10 +38,10 @@ Use this file to pick up the project in any AI tool or by hand. Read it first, t
 - `SECURITY.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `README.md`: documentation.
 
 ## Where user data lives
-`%USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar`: `settings.txt` (theme, language), `crash.log` (unexpected errors), `brightness.log` (built-in panel failures). Settings were moved from `%LOCALAPPDATA%\Lumistar` in 1.1.3; `migrateSettings()` copies them once.
+`%USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar`: `settings.txt` (theme, language), `crash.log` (unexpected errors), `brightness.log` (built-in panel failures). Settings were moved from `%LOCALAPPDATA%\Lumistar` in 1.1.3 (the data folder is unchanged since then); `migrateSettings()` copies them once.
 
 ## Open issues
-1. **Laptop built-in brightness does not change on the maintainer's laptop (reported on v1.0.0).** 1.1.3 writes each WMI failure to `brightness.log` with its HRESULT. Next step: get that file from the laptop and fix the step that fails (`CoCreateInstance`, `ConnectServer`, `ExecQuery`, or `WmiSetBrightness`). Do not guess at fixes without this file.
+1. **Laptop built-in brightness does not change on the maintainer's laptop (reported on v1.0.0).** 1.1.4 writes each WMI failure to `brightness.log` with its HRESULT. Next step: get that file from the laptop and fix the step that fails (`CoCreateInstance`, `ConnectServer`, `ExecQuery`, or `WmiSetBrightness`). Do not guess at fixes without this file.
 2. **Translations.** The 96 languages are all present. The Themes label, the microphone help text and the theme help row are translated in the 64 languages from earlier versions. The 32 newest languages have partial UI words; the help page is English for most of them. Some very small Caucasian and Turkic languages are English except for their name (sah, tyv, ce, av, lez, os, kbd, ady, inh, ab, and others). Native review is needed before calling them translated.
 3. **Not signed.** Windows SmartScreen may warn. Antivirus false positives are possible; report the SHA-256 of the release file to Microsoft.
 4. **No MSI.** The installer is NSIS (`.exe`). An MSI would need WiX and a separate installer script; not requested.
@@ -55,4 +55,3 @@ Go about 87.6% of all files in the repository (about 92% of code only), NSIS abo
 - Build and test on Windows 10 or 11 before tagging.
 - Do not add background services, telemetry, PowerShell or new network calls.
 - Bump the version in `app.rc`, `app.manifest`, `installer.nsi` and `CHANGELOG.md` together.
-- The Starmoon project is a separate program and is not part of this repository.
