@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync/atomic"
 	"time"
 	"unsafe"
 )
@@ -72,7 +73,14 @@ func wbemRun(f func()) {
 }
 
 // internalGet returns the brightness of the built-in panel, if the PC has one.
+// panelState: 0 not checked yet, 1 the built-in panel answers WMI, 2 this PC has no such panel.
+// A PC without a built-in panel is checked once per run of Lumistar, not on every display event.
+var panelState int32
+
 func internalGet() (int, bool) {
+	if atomic.LoadInt32(&panelState) == 2 {
+		return 0, false
+	}
 	var v int
 	var ok bool
 	wbemRun(func() {
@@ -80,6 +88,12 @@ func internalGet() (int, bool) {
 			v, ok = wbemReadBrightness()
 		}
 	})
+	if ok {
+		atomic.StoreInt32(&panelState, 1)
+	} else if atomic.LoadInt32(&panelState) == 0 {
+		atomic.StoreInt32(&panelState, 2)
+		brightLog("no built-in panel answered WMI; not checked again until Lumistar restarts")
+	}
 	return v, ok
 }
 

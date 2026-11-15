@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.5
+
+- Built-in panel check: a PC without a built-in panel (most desktops) is checked once per run. No repeated WMI queries and no repeated `brightness.log` lines.
+- Removed unused code.
+
 ## v1.1.4
 
 Hardening and compatibility release. No new features.

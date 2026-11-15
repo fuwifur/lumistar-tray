@@ -605,10 +605,6 @@ func rightRowMin(it []item, right, y, h, gap, minLeft int, bs []item) ([]item, i
 	return it, x + gap
 }
 
-func rightRow(it []item, right, y, h, gap int, bs []item) ([]item, int) {
-	return rightRowMin(it, right, y, h, gap, 0, bs)
-}
-
 // leftRow places buttons from the left edge going right, shrinking them if the row would overflow.
 func leftRow(it []item, left, right, y, h, gap int, bs []item) []item {
 	ws := make([]int, len(bs))
@@ -2179,8 +2175,8 @@ var themePalettes = []palette{
 
 // ---------------------------------------------------------------- release line, data folder
 
-const releaseText = "v1.1.4"
-const appVersion = "1.1.4"
+const releaseText = "v1.1.5"
+const appVersion = "1.1.5"
 
 // releaseColour is a fixed, bright purple. It does not change with the theme.
 const releaseColour = uint32(0xC084FC)
