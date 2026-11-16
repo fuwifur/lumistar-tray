@@ -12,9 +12,13 @@ windres -O coff -i app.rc -o rsrc_windows_amd64.syso
 $env:GOOS = "windows"; $env:GOARCH = "amd64"; $env:CGO_ENABLED = "0"
 go build -trimpath -ldflags "-H windowsgui -s -w" -o Lumistar.exe .
 
+# Checksum of the program; the installer ships it as SHA256SUMS.txt
+Get-FileHash -Algorithm SHA256 Lumistar.exe | ForEach-Object { "$($_.Hash.ToLower())  Lumistar.exe" } | Set-Content -Encoding ascii SHA256SUMS.txt
+
 # Installer
 $makensis = (Get-Command makensis -ErrorAction SilentlyContinue).Source
 if (-not $makensis) { $makensis = Join-Path ${env:ProgramFiles(x86)} "NSIS\makensis.exe" }
 & $makensis -V1 installer.nsi
+if ($LASTEXITCODE -ne 0) { throw "makensis failed ($LASTEXITCODE)" }
 
 Write-Host "Done: Lumistar.exe and Lumistar-Setup.exe"

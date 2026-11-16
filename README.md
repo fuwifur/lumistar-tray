@@ -17,7 +17,7 @@
   <img alt="Language" src="https://img.shields.io/badge/built%20with-Go-00ADD8">
 </p>
 
-**Current version: v1.1.5**
+**Current version: v1.1.8**
 
 Lumistar is a lightweight alternative to [Twinkle Tray](https://github.com/xanderfrangos/twinkle-tray). It lives in the system tray, opens a small panel with one click, and stays out of your taskbar. It is written in Go with the standard library only, so the program is a single small `.exe`.
 
@@ -43,6 +43,8 @@ Lumistar is a lightweight alternative to [Twinkle Tray](https://github.com/xande
 Download `Lumistar-Setup.exe` from the [Releases](https://github.com/fuwifur/lumistar-tray/releases/latest) page and run it. Or download `Lumistar.exe` for a copy that needs no installation.
 
 The installer asks where to put Lumistar: Desktop (portable, default), Documents (portable), Program Files, AppData Local Programs (`%LOCALAPPDATA%\Programs\Lumistar`), or a folder of your choice. Standard installations appear in Settings > Apps and can be removed there.
+
+The installed folder also contains `SHA256SUMS.txt`, the SHA-256 value of `Lumistar.exe`. Check the program with `Get-FileHash .\Lumistar.exe -Algorithm SHA256`.
 
 ## Where your data lives
 

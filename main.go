@@ -244,7 +244,7 @@ func snap() snapshot {
 		autostart: autostart, night: night, awake: awake, help: help, langPage: langPage, langPg: langPg, micMuted: micMuted, vol: vol, lang: lang}
 }
 
-// All settings live in %LOCALAPPDATA%\Lumistar, whichever folder Lumistar was installed to.
+// All settings live in %USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar, whichever folder Lumistar was installed to.
 
 func loadTheme() {
 	migrateSettings()
@@ -1990,7 +1990,7 @@ func strPtr(s string) uintptr {
 }
 
 // guard is deferred in every callback and goroutine: instead of letting an unexpected error close Lumistar,
-// it writes the details to %LOCALAPPDATA%\Lumistar\crash.log and keeps the program running.
+// it writes the details to crash.log in the Lumistar data folder and keeps the program running.
 func guard() {
 	if r := recover(); r != nil {
 		logPanic(r)
@@ -2175,8 +2175,8 @@ var themePalettes = []palette{
 
 // ---------------------------------------------------------------- release line, data folder
 
-const releaseText = "v1.1.5"
-const appVersion = "1.1.5"
+const releaseText = "v1.1.8"
+const appVersion = "1.1.8"
 
 // releaseColour is a fixed, bright purple. It does not change with the theme.
 const releaseColour = uint32(0xC084FC)
@@ -2232,7 +2232,7 @@ func settingsPath() string {
 	return filepath.Join(dataDir(), "settings.txt")
 }
 
-// migrateSettings copies settings from the old %LOCALAPPDATA%\Lumistar folder, once.
+// migrateSettings copies settings from the old %LOCALAPPDATA%\Lumistar folder, once (versions 1.1.3 and earlier).
 func migrateSettings() {
 	if _, err := os.Stat(settingsPath()); err == nil {
 		return

@@ -1,6 +1,7 @@
 # Build output (attach these to GitHub Releases instead)
 *.exe
 *.syso
+SHA256SUMS.txt
 dist/
 # Generated during the build
 rsrc_windows_amd64.syso

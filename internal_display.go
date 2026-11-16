@@ -78,7 +78,8 @@ func wbemRun(f func()) {
 var panelState int32
 
 func internalGet() (int, bool) {
-	if atomic.LoadInt32(&panelState) == 2 {
+	if atomic.LoadInt32(&panelState) == 2 || !hasBattery() {
+		atomic.StoreInt32(&panelState, 2)
 		return 0, false
 	}
 	var v int
@@ -270,4 +271,23 @@ func brightLog(msg string) {
 	}
 	defer f.Close()
 	fmt.Fprintf(f, "%s  %s\n", time.Now().Format("2006-01-02 15:04:05"), msg)
+}
+
+// systemPowerStatus is the Win32 SYSTEM_POWER_STATUS structure.
+type systemPowerStatus struct {
+	ACLineStatus, BatteryFlag, BatteryLifePercent, SystemStatusFlag byte
+	BatteryLifeTime, BatteryFullLifeTime                            uint32
+}
+
+var pGetPowerStatus = sysDLL("kernel32.dll").NewProc("GetSystemPowerStatus")
+
+// hasBattery reports whether this PC has a battery (laptops do, desktops do not).
+// BatteryFlag 128 means "no system battery". If Windows cannot answer, the PC is treated
+// as a laptop, so the diagnostic log stays available.
+func hasBattery() bool {
+	var s systemPowerStatus
+	if call(pGetPowerStatus, uintptr(unsafe.Pointer(&s))) == 0 {
+		return true
+	}
+	return s.BatteryFlag != 128
 }

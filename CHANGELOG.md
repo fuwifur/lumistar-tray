@@ -1,5 +1,24 @@
 # Changelog
 
+## v1.1.8
+
+- The installer is 64 bit (`Target amd64-unicode`), like the program. Nothing in the program or the installer depends on 32-bit time values.
+- Installer texts show the current data folder (`%USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar`).
+
+## v1.1.7
+
+- The installer places `SHA256SUMS.txt` (the SHA-256 value of `Lumistar.exe`) in the program folder, next to `Lumistar.exe`. The release file lists both downloads.
+- Build scripts write `SHA256SUMS.txt` before the installer is built. The installer cannot contain a checksum of itself, so the installed file covers the program only.
+- The installer no longer deletes a `settings.txt` from the program folder; uninstall removes `SHA256SUMS.txt`.
+- The installed README explains how to check the program.
+- Line endings are LF in the working tree (`eol=lf`), so Windows Git no longer reports unchanged files as modified.
+- Build error handling: a failing NSIS build stops the script.
+
+## v1.1.6
+
+- Built-in panel: PCs without a battery (desktops) skip the built-in check entirely. No WMI query and no `brightness.log` entry on desktops. Laptops keep the diagnostic log.
+- Unused code checked again: none found.
+
 ## v1.1.5
 
 - Built-in panel check: a PC without a built-in panel (most desktops) is checked once per run. No repeated WMI queries and no repeated `brightness.log` lines.

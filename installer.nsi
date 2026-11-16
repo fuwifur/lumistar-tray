@@ -1,5 +1,6 @@
-; Lumistar installer. The program goes into a folder named "Lumistar"; its settings always live in %LOCALAPPDATA%\Lumistar.
+; Lumistar installer. The program goes into a folder named "Lumistar"; its settings always live in %USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar.
 Unicode true
+Target amd64-unicode
 ManifestDPIAware true
 Name "Lumistar"
 OutFile "Lumistar-Setup.exe"
@@ -16,7 +17,7 @@ ShowInstDetails nevershow
 !insertmacro GetOptions
 
 !define APPNAME "Lumistar"
-!define VERSION "1.1.5"
+!define VERSION "1.1.8"
 !define UNKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Lumistar"
 !define RUNKEY "Software\Microsoft\Windows\CurrentVersion\Run"
 
@@ -203,7 +204,7 @@ Function LocationLeave
   ${OrIf} $Choice == 4
     StrCpy $Registered 1
   ${ElseIf} $Choice == 5
-    MessageBox MB_YESNO|MB_ICONQUESTION "Add Lumistar to the Windows list of installed programs?$\r$\n$\r$\nYES: it can be removed from Settings > Apps and by uninstaller tools.$\r$\nNO: portable copy that is not listed anywhere; remove it by deleting its folder and the Lumistar folder in AppData\Local." IDNO custom_portable
+    MessageBox MB_YESNO|MB_ICONQUESTION "Add Lumistar to the Windows list of installed programs?$\r$\n$\r$\nYES: it can be removed from Settings > Apps and by uninstaller tools.$\r$\nNO: portable copy that is not listed anywhere; remove it by deleting its folder and %USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar." IDNO custom_portable
     StrCpy $Registered 1
     custom_portable:
   ${EndIf}
@@ -216,6 +217,7 @@ Section "Lumistar (required)" SecMain
   Sleep 400
   SetOutPath "$INSTDIR"
   File "Lumistar.exe"
+  File "SHA256SUMS.txt"
 
   ; README.txt: a short header about this copy, then the shared removal guide.
   InitPluginsDir
@@ -290,8 +292,8 @@ Section "Uninstall"
     RMDir /r "$INSTDIR"
   ${Else}
     Delete "$INSTDIR\Lumistar.exe"
-    Delete "$INSTDIR\settings.txt"
     Delete "$INSTDIR\README.txt"
+    Delete "$INSTDIR\SHA256SUMS.txt"
     Delete "$INSTDIR\Uninstall.exe"
     RMDir "$INSTDIR"
   ${EndIf}

@@ -1,7 +1,7 @@
 LUMISTAR - README
 =================
 
-Version 1.1.5
+Version 1.1.8
 
 WHAT IS LUMISTAR?
 -----------------
@@ -12,6 +12,10 @@ click it again to close it. Press the "?" button inside the panel for a full hel
 WHERE EVERYTHING IS STORED
 --------------------------
 The program: the folder named "Lumistar" that contains this README.
+
+SHA256SUMS.txt in the same folder holds the SHA-256 value of Lumistar.exe. To check the program:
+  Get-FileHash .\Lumistar.exe -Algorithm SHA256
+The value must match the one in SHA256SUMS.txt.
 
 All Lumistar data (settings, theme, language, crash reports, brightness diagnostics) is kept in:
 

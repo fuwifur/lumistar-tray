@@ -4,4 +4,5 @@ set -e
 [ -f go.mod ] || go mod init lumistar
 x86_64-w64-mingw32-windres --preprocessor=./pp.sh -O coff -i app.rc -o rsrc_windows_amd64.syso
 GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-H windowsgui -s -w" -o Lumistar.exe .
+sha256sum Lumistar.exe > SHA256SUMS.txt
 makensis -V1 installer.nsi
