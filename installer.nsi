@@ -1,6 +1,5 @@
 ; Lumistar installer. The program goes into a folder named "Lumistar"; its settings always live in %USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar.
 Unicode true
-Target amd64-unicode
 ManifestDPIAware true
 Name "Lumistar"
 OutFile "Lumistar-Setup.exe"
@@ -17,7 +16,7 @@ ShowInstDetails nevershow
 !insertmacro GetOptions
 
 !define APPNAME "Lumistar"
-!define VERSION "1.1.8"
+!define VERSION "1.1.9"
 !define UNKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Lumistar"
 !define RUNKEY "Software\Microsoft\Windows\CurrentVersion\Run"
 

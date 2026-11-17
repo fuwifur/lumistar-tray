@@ -2175,8 +2175,8 @@ var themePalettes = []palette{
 
 // ---------------------------------------------------------------- release line, data folder
 
-const releaseText = "v1.1.8"
-const appVersion = "1.1.8"
+const releaseText = "v1.1.9"
+const appVersion = "1.1.9"
 
 // releaseColour is a fixed, bright purple. It does not change with the theme.
 const releaseColour = uint32(0xC084FC)
