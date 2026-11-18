@@ -17,7 +17,7 @@
   <img alt="Language" src="https://img.shields.io/badge/built%20with-Go-00ADD8">
 </p>
 
-**Current version: v1.1.9**
+**Current version: v1.2.1**
 
 Lumistar is a lightweight alternative to [Twinkle Tray](https://github.com/xanderfrangos/twinkle-tray). It lives in the system tray, opens a small panel with one click, and stays out of your taskbar. It is written in Go with the standard library only, so the program is a single small `.exe`.
 
@@ -48,7 +48,7 @@ The installed folder also contains `SHA256SUMS.txt`, the SHA-256 value of `Lumis
 
 ## Where your data lives
 
-All Lumistar data (settings, theme, language, crash and brightness logs) is kept in one folder:
+Lumistar keeps everything in one folder. Each start writes `settings.txt`, `SHA256SUMS.txt` (checksum of the running program), `README.txt`, `version.txt`, `install-path.txt`, `last-start.txt` and `lumistar.log`. `brightness.log` (laptops) and `crash.log` (after an error) appear only when needed:
 
 ```
 C:\Users\<your name>\AppData\LocalLow\fuwifur\Lumistar

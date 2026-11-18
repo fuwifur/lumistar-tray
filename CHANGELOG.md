@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.2.1
+
+Changes since v1.1.9.
+
+- Every start writes these files to the data folder: `settings.txt` (only when missing), `SHA256SUMS.txt` (checksum of the running `Lumistar.exe`), `README.txt` (what each file is), `version.txt`, `install-path.txt`, `last-start.txt`, and one line in `lumistar.log` per start.
+- `lumistar.log` moves its older part to `lumistar.log.old` past about 1 MB.
+- The installed folder and the data folder both contain `README.txt` and `SHA256SUMS.txt`.
+- Built-in panel check on desktops without a battery: no WMI query and no `brightness.log` entry (from the unpublished 1.1.6).
+- Installer ships `SHA256SUMS.txt` (from the unpublished 1.1.7). Build scripts write it before the installer is built.
+- Installer texts show the current data folder; the obsolete `settings.txt` delete is removed (from the unpublished 1.1.8).
+- `.gitattributes` uses `eol=lf`; the unused `pp.sh` was restored (it is used by `build.sh`).
+
 ## v1.1.9
 
 First published release since v1.1.5. It contains everything from the unpublished v1.1.6 to v1.1.8 builds.
