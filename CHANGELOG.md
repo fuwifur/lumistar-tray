@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.4
+
+Final consistency pass before release. Checked: version numbers in every source and document, installer script and manifest, the data folder description in the handoff, the Go and NSIS static checks, and the package contents.
+
+- Version numbers aligned everywhere (program, resources, manifest, installer, README, handoff).
+- `HANDOFF.md`: the data folder list matches what the program writes; the tag note no longer names one fixed version.
+- The package no longer includes Python cache files.
+
 ## v1.2.1
 
 Changes since v1.1.9.
