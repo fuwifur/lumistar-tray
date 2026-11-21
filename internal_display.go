@@ -78,8 +78,7 @@ func wbemRun(f func()) {
 var panelState int32
 
 func internalGet() (int, bool) {
-	if atomic.LoadInt32(&panelState) == 2 || !hasBattery() {
-		atomic.StoreInt32(&panelState, 2)
+	if atomic.LoadInt32(&panelState) == 2 {
 		return 0, false
 	}
 	var v int
@@ -264,6 +263,9 @@ func wbemWriteBrightness(level int) bool {
 
 // brightLog appends one line to brightness.log in the Lumistar data folder, so a failing laptop panel can be diagnosed.
 func brightLog(msg string) {
+	if !hasBattery() {
+		return // desktops have no built-in panel; the log stays empty there
+	}
 	os.MkdirAll(dataDir(), 0o755)
 	f, err := os.OpenFile(filepath.Join(dataDir(), "brightness.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {

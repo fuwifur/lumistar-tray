@@ -1,7 +1,7 @@
 LUMISTAR - README
 =================
 
-Version 1.2.4
+Version 1.3.2
 
 WHAT IS LUMISTAR?
 -----------------
@@ -36,7 +36,7 @@ Portable (Desktop, Documents, or a custom location you choose not to register)
   Nothing is registered with Windows. Removing it means deleting its program folder and the data folder above.
 
 Standard (Program Files, AppData Local Programs, or a custom location you choose to register)
-  Lumistar is listed in Settings > Apps and can be removed there. The uninstaller also removes the data folder.
+  Lumistar is listed in Settings > Apps and can be removed there. The uninstaller keeps the data folder. Delete it yourself if you want all data removed.
 
 HOW TO REMOVE LUMISTAR
 ----------------------

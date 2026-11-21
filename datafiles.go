@@ -94,7 +94,7 @@ const dataReadme = `Lumistar data folder
 
 Lumistar creates this folder. The program does not need any of these files to run.
 
-settings.txt       Theme and language. Written only when the file is missing.
+settings.txt       Theme and language. Created when missing; updated when you change the theme or language.
 SHA256SUMS.txt     SHA-256 value of the Lumistar.exe that last ran from this PC.
 README.txt         This file. It is rewritten each time Lumistar starts.
 version.txt        The Lumistar version and the build it was made with.
@@ -105,6 +105,6 @@ lumistar.log       One line for each start. Past about 1 MB the older part moves
 brightness.log     Laptops only: why the built-in panel slider did not work.
 crash.log          Only after an error: the details of that error.
 
-To reset the settings, delete settings.txt. To remove everything, uninstall Lumistar
-or delete this folder.
+To reset the settings, delete settings.txt. The uninstaller keeps this folder;
+delete it yourself to remove all of Lumistar's data.
 `

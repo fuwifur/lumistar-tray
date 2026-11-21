@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.3.2
+
+Changes since v1.2.4.
+
+- Built-in brightness: the WMI check runs once per start on every PC. The failure lines in `brightness.log` are written only on a PC with a battery; desktops never get that file.
+- Uninstall keeps the data folder `%USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar`. The installed README and the data folder README say so.
+- Minority languages of Russia and the Caucasus without a reliable translation show Russian instead of English.
+- `SECURITY.md` documents that the program reads its own `Lumistar.exe` to write `SHA256SUMS.txt`.
+- `HANDOFF.md` corrected: Windows 10 and 11 only, one Build section, the open laptop brightness issue, the current data folder list.
+- Data folder README: the `settings.txt` wording is correct.
+- `.gitignore` keeps `__pycache__/` out of the repository.
+
 ## v1.2.4
 
 Final consistency pass before release. Checked: version numbers in every source and document, installer script and manifest, the data folder description in the handoff, the Go and NSIS static checks, and the package contents.

@@ -1754,15 +1754,36 @@ var enUSIndex = len(langs) - 1
 var lang = enUSIndex
 
 // tx returns the panel text for key in the chosen language (English when a translation is missing).
+// russianFallback lists the minority languages of Russia and the Caucasus that have no reliable
+// translation yet. Where their text is missing, Russian is shown instead of English.
+var russianFallback = map[string]bool{
+	"ab": true, "av": true, "ce": true, "lez": true, "os": true, "kbd": true, "ady": true, "inh": true,
+	"tt": true, "ba": true, "cv": true, "sah": true, "tyv": true, "krc": true, "kum": true,
+}
+
+func langIndexOf(code string) int {
+	for i, l := range langs {
+		if l.code == code {
+			return i
+		}
+	}
+	return -1
+}
+
+var ruCol = langIndexOf("ru")
+
 func tx(key string) string {
 	v := strs[key]
 	if lang >= 0 && lang < len(v) && v[lang] != "" {
 		return v[lang]
 	}
+	if lang >= 0 && lang < len(langs) && russianFallback[langs[lang].code] && ruCol >= 0 && ruCol < len(v) && v[ruCol] != "" {
+		return v[ruCol]
+	}
 	return v[0]
 }
 
-// Column order follows langs above (the last column is EN US). An empty entry means "not translated yet": tx falls back to English.
+// Column order follows langs above (the last column is EN US). An empty entry means "not translated yet": tx falls back to Russian for the languages in russianFallback, otherwise to English.
 var strs = map[string][97]string{
 	"brightness":   {"Brightness", "Helligkeit", "Parlaklık", "Parlaqlıq", "Brillo", "Luminosité", "Jasność", "Яркость", "Brilho", "Luminosità", "Helderheid", "Luminozitate", "Fényerő", "Ljusstyrka", "Jas", "Brillantor", "Yorqinlik", "Жарықтық", "يورۇقلۇق", "Ýagtylyk", "Жарыктык", "Яктылык", "Яҡтылыҡ", "Ҫутлӑх", "روشنایی", "Jarqıraw", "Parlaqlıq", "Ярықлыҕы", "", "Жарыкълыкъ", "", "Parlaklık", "روشنایی", "Ronahî", "Φωτεινότητα", "روشنی", "Равшанӣ", "Պայծառություն", "ڕووناکی", "სიკაშკაშე", "Ronahî", "", "", "", "", "", "", "", "", "亮度", "चमक", "السطوع", "উজ্জ্বলতা", "روشنی", "Kecerahan", "Mwangaza", "明るさ", "ਚਮਕ", "चमक", "ప్రకాశం", "Độ sáng", "Padhang", "Kecerahan", "Liwanag", "밝기", "பிரகாசம்", "Haske", "તેજ", "ความสว่าง", "ಹೊಳಪು", "روښنایی", "ብሩህነት", "", "Ìmọ́lẹ̀", "တောက်ပမှု", "", "Яскравість", "", "തെളിച്ചം", "", "", "चमक", "Ìhè", "", "", "Ukukhanya", "", "Iftiin", "Ukukhanya", "Helderheid", "දීප්තිය", "ពន្លឺ", "בהירות", "Яркост", "Осветљеност", "Lysstyrke", ""},
 	"volume":       {"Volume", "Lautstärke", "Ses", "Səs", "Volumen", "Volume", "Głośność", "Громкость", "Volume", "Volume", "Volume", "Volum", "Hangerő", "Volym", "Hlasitost", "Volum", "Ovoz balandligi", "Дыбыс деңгейі", "ئاۋاز", "Ses derejesi", "Үн деңгээли", "Тавыш көче", "Тауыш", "Сас", "صدا", "Dawıs", "Ses", "Ses", "", "Ses", "", "Ses", "بلندی صدا", "Deng", "Ένταση", "صدا", "Баландии садо", "Ձայնի ուժգնություն", "دەنگ", "ხმის სიძლიერე", "Deng", "", "", "", "", "", "", "", "", "音量", "आवाज़", "مستوى الصوت", "ভলিউম", "آواز", "Volume", "Sauti", "音量", "ਆਵਾਜ਼", "आवाज", "వాల్యూమ్", "Âm lượng", "Volume", "Kelantangan", "Lakas ng tunog", "볼륨", "ஒலியளவு", "Ƙarar sauti", "વોલ્યુમ", "ระดับเสียง", "ವಾಲ್ಯೂಮ್", "غږ", "ድምፅ", "", "Ohùn", "အသံ", "", "Гучність", "", "ശബ്ദം", "", "", "आवाज", "Mgbapụta ụda", "", "", "Ivolumu", "", "Cod", "Ivolumu", "Volume", "හඬ පරිමාව", "កម្រិតសំឡេង", "עוצמת קול", "Сила на звука", "Јачина звука", "Lydstyrke", ""},
@@ -2176,8 +2197,8 @@ var themePalettes = []palette{
 
 // ---------------------------------------------------------------- release line, data folder
 
-const releaseText = "v1.2.4"
-const appVersion = "1.2.4"
+const releaseText = "v1.3.2"
+const appVersion = "1.3.2"
 
 // releaseColour is a fixed, bright purple. It does not change with the theme.
 const releaseColour = uint32(0xC084FC)

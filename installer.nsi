@@ -16,7 +16,7 @@ ShowInstDetails nevershow
 !insertmacro GetOptions
 
 !define APPNAME "Lumistar"
-!define VERSION "1.2.4"
+!define VERSION "1.3.2"
 !define UNKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Lumistar"
 !define RUNKEY "Software\Microsoft\Windows\CurrentVersion\Run"
 
@@ -203,7 +203,7 @@ Function LocationLeave
   ${OrIf} $Choice == 4
     StrCpy $Registered 1
   ${ElseIf} $Choice == 5
-    MessageBox MB_YESNO|MB_ICONQUESTION "Add Lumistar to the Windows list of installed programs?$\r$\n$\r$\nYES: it can be removed from Settings > Apps and by uninstaller tools.$\r$\nNO: portable copy that is not listed anywhere; remove it by deleting its folder and %USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar." IDNO custom_portable
+    MessageBox MB_YESNO|MB_ICONQUESTION "Add Lumistar to the Windows list of installed programs?$\r$\n$\r$\nYES: it can be removed from Settings > Apps and by uninstaller tools.$\r$\nNO: portable copy that is not listed anywhere; remove it by deleting its folder. Your data folder %USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar stays unless you delete it." IDNO custom_portable
     StrCpy $Registered 1
     custom_portable:
   ${EndIf}
@@ -284,7 +284,6 @@ Section "Uninstall"
   Delete "$DESKTOP\Lumistar.lnk"
   DeleteRegKey HKCU "${UNKEY}"
   DeleteRegValue HKCU "${RUNKEY}" "Lumistar"
-  RMDir /r "$PROFILE\AppData\LocalLow\fuwifur\Lumistar"
   ; Only ever remove a folder that is really named "Lumistar".
   StrCpy $0 "$INSTDIR" 9 -9
   ${If} $0 == "\Lumistar"
