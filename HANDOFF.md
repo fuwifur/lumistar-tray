@@ -3,7 +3,7 @@
 Read this file first, then `CHANGELOG.md` and `README.md`.
 
 ## Current state
-- Version: **v1.4.1** (`main.go`, `app.rc`, `app.manifest`, `installer.nsi`, `README.md`, `README_body.txt`, `CHANGELOG.md` must all say the same version).
+- Version: **v1.4.2** (`main.go`, `app.rc`, `app.manifest`, `installer.nsi`, `README.md`, `README_body.txt`, `CHANGELOG.md` must all say the same version).
 - Tags (`v1.x.y`) are created by the maintainer after the code is committed. CI builds `Lumistar.exe` and `Lumistar-Setup.exe` from the tag and attaches them with `SHA256SUMS.txt`.
 - The program is Go (standard library only), a Windows resource file and an NSIS installer.
 

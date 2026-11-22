@@ -1,7 +1,7 @@
 LUMISTAR - README
 =================
 
-Version 1.4.1
+Version 1.4.2
 
 WHAT IS LUMISTAR?
 -----------------

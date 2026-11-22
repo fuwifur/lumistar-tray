@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.2
+
+Changes since v1.4.1.
+
+- The display selector (`All`, `1`, `2`, ...) moved to the left, under the brightness sliders, and is smaller. It is shown for one display too.
+
 ## v1.4.1
 
 Changes since v1.3.2.

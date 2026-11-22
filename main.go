@@ -678,7 +678,7 @@ func build(s snapshot) ([]item, int) {
 	n := max(len(s.disp), 1)
 	ch := px(34) + n*px(48) + px(8)
 	if len(s.disp) >= 1 {
-		ch += px(28) // the display selector row, shown for one display too
+		ch += px(26) // the display selector row, shown for one display too
 	}
 	it = append(it, item{kind: kCard, r: rc(pad, y, W-pad, y+ch)})
 	pw := 10*px(24) + 9*px(2)
@@ -696,12 +696,12 @@ func build(s snapshot) ([]item, int) {
 	})...)
 	if len(s.disp) >= 1 {
 		sy := y + px(34) + n*px(48) + px(4)
-		x := W - pad - ip - px(40) - px(26)*len(s.disp) - px(4)*len(s.disp)
-		it = append(it, item{kind: kButton, id: "ds-1", font: 4, on: presetDisp < 0, text: tx("alldisp"), r: rc(x, sy, x+px(40), sy+px(22)), flags: tCenter})
-		x += px(44)
+		x := pad + ip
+		it = append(it, item{kind: kButton, id: "ds-1", font: 4, on: presetDisp < 0, text: tx("alldisp"), r: rc(x, sy, x+px(34), sy+px(20)), flags: tCenter})
+		x += px(38)
 		for i := range s.disp {
-			it = append(it, item{kind: kButton, id: "ds" + strconv.Itoa(i), font: 4, on: presetDisp == i, text: strconv.Itoa(i + 1), r: rc(x, sy, x+px(26), sy+px(22)), flags: tCenter})
-			x += px(30)
+			it = append(it, item{kind: kButton, id: "ds" + strconv.Itoa(i), font: 4, on: presetDisp == i, text: strconv.Itoa(i + 1), r: rc(x, sy, x+px(22), sy+px(20)), flags: tCenter})
+			x += px(26)
 		}
 	}
 	ry := y + px(34)
@@ -2230,8 +2230,8 @@ var themePalettes = []palette{
 
 // ---------------------------------------------------------------- release line, data folder
 
-const releaseText = "v1.4.1"
-const appVersion = "1.4.1"
+const releaseText = "v1.4.2"
+const appVersion = "1.4.2"
 
 // releaseColour is a fixed, bright purple. It does not change with the theme.
 const releaseColour = uint32(0xC084FC)
