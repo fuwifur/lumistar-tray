@@ -257,12 +257,14 @@ func loadTheme() {
 			lang = i
 		}
 	}
+	loadMicLevel(text)
 }
 
 // saveTheme writes both settings (theme and language) to settings.txt.
 func saveTheme(_ bool) {
 	t := "theme=" + themeKeys[theme] + "\r\n"
 	t += "language=" + langs[lang].code + "\r\n"
+	t += "miclevel=" + strconv.Itoa(micSavedLevel()) + "\r\n"
 	os.MkdirAll(filepath.Dir(settingsPath()), 0o755)
 	os.WriteFile(settingsPath(), []byte(t), 0o644)
 }
@@ -380,6 +382,11 @@ func main() {
 	round := int32(2)
 	call(pDwmAttr, hwnd, 33, ptr(&round), 4)
 	taskbarMsg = uint32(call(pRegMessage, strPtr("TaskbarCreated")))
+	registerHotkeys()
+	go func() {
+		defer guard()
+		micGuard()
+	}()
 
 	nid.size = uint32(unsafe.Sizeof(nid))
 	nid.hwnd, nid.id, nid.flags, nid.callback, nid.icon = hwnd, 1, 0x7, wmTray, small
@@ -447,6 +454,8 @@ func wndProc(h, m, wp, lp uintptr) uintptr {
 	case 0x100:
 		if wp == 0x1B {
 			hidePanel()
+		} else {
+			keyDown(wp)
 		}
 		return 0
 	case 0x6:
@@ -461,6 +470,9 @@ func wndProc(h, m, wp, lp uintptr) uintptr {
 		return 0
 	case 0x7E:
 		refresh(true)
+		return 0
+	case 0x312: // WM_HOTKEY
+		hotkey(wp)
 		return 0
 	}
 	if taskbarMsg != 0 && uint32(m) == taskbarMsg {
@@ -509,6 +521,7 @@ func showPanel() {
 	}
 	curX, curY, curW, curH = x, y, w, h
 	call(pSetWindowPos, hwnd, ^uintptr(0), iu(x), iu(y), uintptr(w), iu(h), 0x40)
+	focusID, kbdFocus = "", false
 	call(pSetFG, hwnd)
 	refresh(false)
 }
@@ -664,6 +677,9 @@ func build(s snapshot) ([]item, int) {
 	// Brightness card
 	n := max(len(s.disp), 1)
 	ch := px(34) + n*px(48) + px(8)
+	if len(s.disp) >= 1 {
+		ch += px(28) // the display selector row, shown for one display too
+	}
 	it = append(it, item{kind: kCard, r: rc(pad, y, W-pad, y+ch)})
 	pw := 10*px(24) + 9*px(2)
 	it = append(it, item{kind: kText, r: rc(pad+ip, y+px(10), W-pad-ip-pw-px(6), y+px(28)), text: tx("brightness"), font: 2, col: 1, flags: tLeft})
@@ -671,13 +687,23 @@ func build(s snapshot) ([]item, int) {
 		if len(s.disp) == 0 {
 			return false
 		}
-		for _, d := range s.disp {
-			if d.val != v {
+		for i, d := range s.disp {
+			if (presetDisp < 0 || presetDisp == i) && d.val != v {
 				return false
 			}
 		}
 		return true
 	})...)
+	if len(s.disp) >= 1 {
+		sy := y + px(34) + n*px(48) + px(4)
+		x := W - pad - ip - px(40) - px(26)*len(s.disp) - px(4)*len(s.disp)
+		it = append(it, item{kind: kButton, id: "ds-1", font: 4, on: presetDisp < 0, text: tx("alldisp"), r: rc(x, sy, x+px(40), sy+px(22)), flags: tCenter})
+		x += px(44)
+		for i := range s.disp {
+			it = append(it, item{kind: kButton, id: "ds" + strconv.Itoa(i), font: 4, on: presetDisp == i, text: strconv.Itoa(i + 1), r: rc(x, sy, x+px(26), sy+px(22)), flags: tCenter})
+			x += px(30)
+		}
+	}
 	ry := y + px(34)
 	switch {
 	case !s.loaded:
@@ -923,6 +949,7 @@ func paint() {
 			p.dot(cx-tr, cy-tr, 2*tr, 2*tr, fill)
 			p.dot(cx-tr+px(2), cy-tr+px(2), 2*tr-px(4), 2*tr-px(4), 0xffffff)
 		}
+		drawRing(p, it, pal.accent)
 	}
 	call(pGdipDelGfx, g)
 	for _, b := range p.br {
@@ -980,6 +1007,7 @@ func sliderValue(s snapshot, id string) int {
 func lparam(lp uintptr) (int, int) { return int(int16(lp & 0xFFFF)), int(int16((lp >> 16) & 0xFFFF)) }
 
 func mouseDown(lp uintptr) {
+	kbdFocus = false // a mouse click hides the keyboard focus ring
 	x, y := lparam(lp)
 	s := snap()
 	items, _ := build(s)
@@ -998,93 +1026,105 @@ func mouseDown(lp uintptr) {
 		if x < int(r.l) || x >= int(r.r) || y < int(r.t) || y >= int(r.b) {
 			continue
 		}
-		switch {
-		case it.kind == kSlider:
+		if it.kind == kSlider {
 			drag = it.id
 			call(pSetCapture, hwnd)
 			setSlider(it, x)
-		case it.id == "quit":
-			quit()
-		case it.id == "themes":
-			mu.Lock()
-			themesPage, help, langPage = true, false, false
-			mu.Unlock()
-			relayout()
-		case it.id == "backthemes":
-			mu.Lock()
-			themesPage = false
-			mu.Unlock()
-			relayout()
-		case len(it.id) == 2 && it.id[0] == 'T':
-			setTheme(int(it.id[1] - '0'))
-		case it.id == "mute":
-			mu.Lock()
-			muted = !muted
-			m := muted
-			mu.Unlock()
-			go func() {
-				defer guard()
-				setMute(m)
-			}()
-		case strings.HasPrefix(it.id, "pb") || strings.HasPrefix(it.id, "pv"):
-			applyPreset(it.id)
-		case it.id == "help" || it.id == "back":
-			mu.Lock()
-			help = it.id == "help"
-			langPage, langPg, helpScroll = false, 0, 0
-			themesPage = false
-			mu.Unlock()
-			relayout()
-		case it.id == "langs":
-			mu.Lock()
-			langPage, help, langPg = true, false, 0
-			mu.Unlock()
-			relayout()
-		case it.id == "pgnext" || it.id == "pgprev":
-			mu.Lock()
-			if it.id == "pgnext" && langPg < langPages-1 {
-				langPg++
-			} else if it.id == "pgprev" && langPg > 0 {
-				langPg--
-			}
-			mu.Unlock()
-			relayout()
-		case len(it.id) > 1 && it.id[0] == 'L':
-			selectLang(it.id)
-		case it.id == "soundset":
-			openURL("ms-settings:sound")
-		case it.id == "snip":
-			hidePanel()
-			openURL("ms-screenclip:") // Windows screenshot overlay; no keys are sent
-		case it.id == "mic":
-			toggleMic()
-		case it.id == "lock":
-			lockPC()
-		case it.id == "link":
-			openURL(portfolioURL)
-		case it.id == "linkclaude" || it.id == "claudeicon":
-			openURL(claudeURL)
-		case it.id == "ghicon":
-			openURL(repoURL)
-		case it.id == "night":
-			toggleNight()
-		case it.id == "awake":
-			toggleAwake()
-		case it.id == "off":
-			screenOff()
-		case it.id == "auto":
-			mu.Lock()
-			autostart = !autostart
-			a := autostart
-			mu.Unlock()
-			go func() {
-				defer guard()
-				setAutostart(a)
-			}()
+			return
 		}
-		call(pInvalidate, hwnd, 0, 0)
+		activate(it)
 		return
 	}
+}
+
+// activate runs the action of a button, check box or link. Mouse clicks and the keyboard (Enter, Space) both use it.
+func activate(it item) {
+	switch {
+	case it.id == "quit":
+		quit()
+	case strings.HasPrefix(it.id, "ds"):
+		if v, err := strconv.Atoi(it.id[2:]); err == nil {
+			presetDisp = v // -1 = all displays
+			relayout()
+		}
+	case it.id == "themes":
+		mu.Lock()
+		themesPage, help, langPage = true, false, false
+		mu.Unlock()
+		relayout()
+	case it.id == "backthemes":
+		mu.Lock()
+		themesPage = false
+		mu.Unlock()
+		relayout()
+	case len(it.id) == 2 && it.id[0] == 'T':
+		setTheme(int(it.id[1] - '0'))
+	case it.id == "mute":
+		mu.Lock()
+		muted = !muted
+		m := muted
+		mu.Unlock()
+		go func() {
+			defer guard()
+			setMute(m)
+		}()
+	case strings.HasPrefix(it.id, "pb") || strings.HasPrefix(it.id, "pv"):
+		applyPreset(it.id)
+	case it.id == "help" || it.id == "back":
+		mu.Lock()
+		help = it.id == "help"
+		langPage, langPg, helpScroll = false, 0, 0
+		themesPage = false
+		mu.Unlock()
+		relayout()
+	case it.id == "langs":
+		mu.Lock()
+		langPage, help, langPg = true, false, 0
+		mu.Unlock()
+		relayout()
+	case it.id == "pgnext" || it.id == "pgprev":
+		mu.Lock()
+		if it.id == "pgnext" && langPg < langPages-1 {
+			langPg++
+		} else if it.id == "pgprev" && langPg > 0 {
+			langPg--
+		}
+		mu.Unlock()
+		relayout()
+	case len(it.id) > 1 && it.id[0] == 'L':
+		selectLang(it.id)
+	case it.id == "soundset":
+		openURL("ms-settings:sound")
+	case it.id == "snip":
+		hidePanel()
+		openURL("ms-screenclip:") // Windows screenshot overlay; no keys are sent
+	case it.id == "mic":
+		toggleMic()
+	case it.id == "lock":
+		lockPC()
+	case it.id == "link":
+		openURL(portfolioURL)
+	case it.id == "linkclaude" || it.id == "claudeicon":
+		openURL(claudeURL)
+	case it.id == "ghicon":
+		openURL(repoURL)
+	case it.id == "night":
+		toggleNight()
+	case it.id == "awake":
+		toggleAwake()
+	case it.id == "off":
+		screenOff()
+	case it.id == "auto":
+		mu.Lock()
+		autostart = !autostart
+		a := autostart
+		mu.Unlock()
+		go func() {
+			defer guard()
+			setAutostart(a)
+		}()
+	}
+	call(pInvalidate, hwnd, 0, 0)
 }
 
 func mouseMove(lp uintptr) {
@@ -1100,7 +1140,11 @@ func mouseMove(lp uintptr) {
 
 func setSlider(it item, x int) {
 	x0, x1, _ := sliderGeometry(it.r)
-	v := min(max((x-x0)*100/max(x1-x0, 1), 0), 100)
+	setSliderValue(it, min(max((x-x0)*100/max(x1-x0, 1), 0), 100))
+}
+
+// setSliderValue sets a volume or display brightness slider to v (0-100).
+func setSliderValue(it item, v int) {
 	if it.id == "v" {
 		mu.Lock()
 		vol = v
@@ -1629,15 +1673,17 @@ func applyPreset(id string) {
 		latest("v", v, setVolume)
 		return
 	}
+	var targets []int
 	mu.Lock()
-	n := len(disp)
 	for i := range disp {
-		disp[i].val = v
+		if presetDisp < 0 || presetDisp == i {
+			disp[i].val = v
+			targets = append(targets, i)
+		}
 	}
 	night = false
 	mu.Unlock()
-	for i := 0; i < n; i++ {
-		i := i
+	for _, i := range targets {
 		latest("b"+strconv.Itoa(i), v, func(x int) { setBrightness(i, x) })
 	}
 }
@@ -1786,6 +1832,7 @@ func tx(key string) string {
 // Column order follows langs above (the last column is EN US). An empty entry means "not translated yet": tx falls back to Russian for the languages in russianFallback, otherwise to English.
 var strs = map[string][97]string{
 	"brightness":   {"Brightness", "Helligkeit", "Parlaklık", "Parlaqlıq", "Brillo", "Luminosité", "Jasność", "Яркость", "Brilho", "Luminosità", "Helderheid", "Luminozitate", "Fényerő", "Ljusstyrka", "Jas", "Brillantor", "Yorqinlik", "Жарықтық", "يورۇقلۇق", "Ýagtylyk", "Жарыктык", "Яктылык", "Яҡтылыҡ", "Ҫутлӑх", "روشنایی", "Jarqıraw", "Parlaqlıq", "Ярықлыҕы", "", "Жарыкълыкъ", "", "Parlaklık", "روشنایی", "Ronahî", "Φωτεινότητα", "روشنی", "Равшанӣ", "Պայծառություն", "ڕووناکی", "სიკაშკაშე", "Ronahî", "", "", "", "", "", "", "", "", "亮度", "चमक", "السطوع", "উজ্জ্বলতা", "روشنی", "Kecerahan", "Mwangaza", "明るさ", "ਚਮਕ", "चमक", "ప్రకాశం", "Độ sáng", "Padhang", "Kecerahan", "Liwanag", "밝기", "பிரகாசம்", "Haske", "તેજ", "ความสว่าง", "ಹೊಳಪು", "روښنایی", "ብሩህነት", "", "Ìmọ́lẹ̀", "တောက်ပမှု", "", "Яскравість", "", "തെളിച്ചം", "", "", "चमक", "Ìhè", "", "", "Ukukhanya", "", "Iftiin", "Ukukhanya", "Helderheid", "දීප්තිය", "ពន្លឺ", "בהירות", "Яркост", "Осветљеност", "Lysstyrke", ""},
+	"alldisp":      {"All"},
 	"volume":       {"Volume", "Lautstärke", "Ses", "Səs", "Volumen", "Volume", "Głośność", "Громкость", "Volume", "Volume", "Volume", "Volum", "Hangerő", "Volym", "Hlasitost", "Volum", "Ovoz balandligi", "Дыбыс деңгейі", "ئاۋاز", "Ses derejesi", "Үн деңгээли", "Тавыш көче", "Тауыш", "Сас", "صدا", "Dawıs", "Ses", "Ses", "", "Ses", "", "Ses", "بلندی صدا", "Deng", "Ένταση", "صدا", "Баландии садо", "Ձայնի ուժգնություն", "دەنگ", "ხმის სიძლიერე", "Deng", "", "", "", "", "", "", "", "", "音量", "आवाज़", "مستوى الصوت", "ভলিউম", "آواز", "Volume", "Sauti", "音量", "ਆਵਾਜ਼", "आवाज", "వాల్యూమ్", "Âm lượng", "Volume", "Kelantangan", "Lakas ng tunog", "볼륨", "ஒலியளவு", "Ƙarar sauti", "વોલ્યુમ", "ระดับเสียง", "ವಾಲ್ಯೂಮ್", "غږ", "ድምፅ", "", "Ohùn", "အသံ", "", "Гучність", "", "ശബ്ദം", "", "", "आवाज", "Mgbapụta ụda", "", "", "Ivolumu", "", "Cod", "Ivolumu", "Volume", "හඬ පරිමාව", "កម្រិតសំឡេង", "עוצמת קול", "Сила на звука", "Јачина звука", "Lydstyrke", ""},
 	"speakers":     {"Speakers", "Lautsprecher", "Hoparlörler", "Dinamiklər", "Altavoces", "Haut-parleurs", "Głośniki", "Динамики", "Alto-falantes", "Altoparlanti", "Luidsprekers", "Difuzoare", "Hangszórók", "Högtalare", "Reproduktory", "Altaveus", "Karnaylar", "Динамиктер", "ئاۋازلىقلار", "Dinamikler", "Динамиктер", "Динамиклар", "Динамиктар", "Динамиксем", "بلندگوها", "Dinamikler", "Dinamikler", "Динамиклер", "", "Динамиклер", "", "Dinamikler", "بلندگوها", "Dengdêr", "Ηχεία", "بلندگوها", "Баландгӯякҳо", "Բարձրախոսներ", "بەرزکەرەوەکان", "დინამიკები", "Dengdêr", "", "", "", "", "", "", "", "", "扬声器", "स्पीकर", "مكبرات الصوت", "স্পিকার", "اسپیکر", "Speaker", "Vipaza sauti", "スピーカー", "ਸਪੀਕਰ", "स्पीकर्स", "స్పీకర్లు", "Loa", "Speaker", "Pembesar suara", "Mga speaker", "스피커", "ஸ்பீக்கர்கள்", "Lasifika", "સ્પીકર્સ", "ลำโพง", "ಸ್ಪೀಕರ್‌ಗಳು", "لوډ سپیکرونه", "ድምጽ ማጉያዎች", "", "Àwọn agbóhùnsáfẹ́fẹ́", "စပီကာများ", "", "Динаміки", "", "സ്പീക്കറുകൾ", "", "", "स्पिकरहरू", "Ndị na-ekwu okwu", "", "", "Izipikha", "", "Sameecado", "Izithethi", "Luidsprekers", "විකාශක", "ឧបករណ៍បំពង្រីកសំឡេង", "רמקולים", "Колонки", "Звучници", "Højttalere", ""},
 	"mute":         {"Mute", "Stumm", "Sessiz", "Səssiz", "Silenciar", "Muet", "Wycisz", "Без звука", "Silenciar", "Muto", "Dempen", "Dezactivează sunetul", "Némítás", "Ljud av", "Ztlumit", "Silencia", "Ovozsiz", "Дыбысты өшіру", "ئاۋازنى ئۆچۈر", "Sessiz", "Үндү өчүрүү", "Тавышны сүндерү", "Тауышты һүндерергә", "Сасине ҫаратасси", "بی‌صدا", "Dawıstı óshiriw", "Sesni qapat", "Sesni öshürüw", "", "Сесни өчюрюү", "", "Sesi kapat", "بی‌صدا", "Bêdeng bike", "Σίγαση", "بی‌صدا", "Хомӯш кардани садо", "Անջատել ձայնը", "بێدەنگ", "დადუმება", "Deng bi bêdeng", "", "", "", "", "", "", "", "", "静音", "म्यूट", "كتم", "মিউট", "خاموش", "Bisukan", "Nyamazisha", "ミュート", "ਮਿਊਟ", "म्यूट", "మ్యూట్", "Tắt tiếng", "Bisu", "Senyap", "I-mute", "음소거", "ஒலியடக்கு", "Rufe sauti", "મ્યૂટ", "ปิดเสียง", "ಮ್ಯೂಟ್", "غږ بند کړئ", "ድምጽ አጥፋ", "", "Pa ohùn mọ́lẹ̀", "အသံတိတ်", "", "Вимкнути звук", "", "നിശബ്ദമാക്കുക", "", "", "म्युट", "Mechie ụda", "", "", "Thulisa", "", "Aamusi", "Thulisa", "Demp", "නිහඬ කරන්න", "បិទសំឡេង", "השתק", "Заглушаване", "Искључи звук", "Slå lyd fra", ""},
@@ -1850,20 +1897,6 @@ func getMic() (muted, ok bool) {
 		}
 	})
 	return
-}
-
-func toggleMic() {
-	mu.Lock()
-	micMuted = !micMuted
-	m := micMuted
-	mu.Unlock()
-	go audioDoFlow(1, func(ep uintptr) {
-		b := uintptr(0)
-		if m {
-			b = 1
-		}
-		vcall(ep, 14, b, 0)
-	})
 }
 
 func lockPC() {
@@ -2197,8 +2230,8 @@ var themePalettes = []palette{
 
 // ---------------------------------------------------------------- release line, data folder
 
-const releaseText = "v1.3.2"
-const appVersion = "1.3.2"
+const releaseText = "v1.4.1"
+const appVersion = "1.4.1"
 
 // releaseColour is a fixed, bright purple. It does not change with the theme.
 const releaseColour = uint32(0xC084FC)

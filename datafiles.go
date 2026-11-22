@@ -94,7 +94,7 @@ const dataReadme = `Lumistar data folder
 
 Lumistar creates this folder. The program does not need any of these files to run.
 
-settings.txt       Theme and language. Created when missing; updated when you change the theme or language.
+settings.txt       Theme, language and the microphone level saved by the microphone lock.
 SHA256SUMS.txt     SHA-256 value of the Lumistar.exe that last ran from this PC.
 README.txt         This file. It is rewritten each time Lumistar starts.
 version.txt        The Lumistar version and the build it was made with.

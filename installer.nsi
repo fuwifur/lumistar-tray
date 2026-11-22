@@ -16,7 +16,7 @@ ShowInstDetails nevershow
 !insertmacro GetOptions
 
 !define APPNAME "Lumistar"
-!define VERSION "1.3.2"
+!define VERSION "1.4.1"
 !define UNKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Lumistar"
 !define RUNKEY "Software\Microsoft\Windows\CurrentVersion\Run"
 

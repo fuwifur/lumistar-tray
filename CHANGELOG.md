@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.4.1
+
+Changes since v1.3.2.
+
+- Keyboard navigation in the panel: Tab and Shift+Tab (or Up and Down) move between controls, Left and Right move a slider by 5, Enter or Space press a button, check box or link. A focus ring shows only while you use the keyboard.
+- Global hotkeys: Ctrl+Alt+Up and Ctrl+Alt+Down change the brightness by 10, Ctrl+Alt+M mutes or unmutes the speakers. A combination another program already uses is skipped.
+- Display selector: when there is more than one display, the brightness card shows All, 1, 2 and so on. The 10-100 presets and the hotkeys change the selected display.
+- Microphone button: pressing it mutes the default microphone and sets its level to 0. The microphone stays muted until the button is pressed again. While it is locked, Lumistar mutes it again within 1.5 seconds if Windows or another program unmutes it or raises the level. The level before the lock is kept in `settings.txt` (`miclevel`).
+- Mouse clicks and keyboard presses use one shared function for buttons, check boxes and links.
+- Security review: link targets are fixed constants, the start-up entry path is quoted, no network or process calls were added.
+
 ## v1.3.2
 
 Changes since v1.2.4.

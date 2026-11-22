@@ -17,7 +17,7 @@
   <img alt="Language" src="https://img.shields.io/badge/built%20with-Go-00ADD8">
 </p>
 
-**Current version: v1.3.2**
+**Current version: v1.4.1**
 
 Lumistar is a lightweight alternative to [Twinkle Tray](https://github.com/xanderfrangos/twinkle-tray). It lives in the system tray, opens a small panel with one click, and stays out of your taskbar. It is written in Go with the standard library only, so the program is a single small `.exe`.
 

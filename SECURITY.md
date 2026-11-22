@@ -8,6 +8,7 @@
 - Opens Windows pages or tools only when you press their button: Sound settings (`ms-settings:sound`) and the screenshot overlay (`ms-screenclip:`). The Help page's links open in your browser.
 - Optionally writes a `Lumistar` value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` when "Launch at start-up" is on, and removes it when it is off.
 - Stores its data (settings, logs) only in `%USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar`.
+- Mutes the default microphone and sets its level to 0 when you press the microphone button. While Lumistar holds the microphone muted, it checks the device every 1.5 seconds and mutes it again if something else unmuted it. Only the microphone button unlocks it.
 - Reads its own `Lumistar.exe` once per start to compute its SHA-256 value, which it writes to `SHA256SUMS.txt` in the data folder. The value is not sent anywhere.
 
 ## Hardening in place

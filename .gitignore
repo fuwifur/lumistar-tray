@@ -13,4 +13,3 @@ crash.log
 .idea/
 Thumbs.db
 .DS_Store
-__pycache__/

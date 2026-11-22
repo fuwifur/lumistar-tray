@@ -3,7 +3,7 @@
 Read this file first, then `CHANGELOG.md` and `README.md`.
 
 ## Current state
-- Version: **v1.3.2** (`main.go`, `app.rc`, `app.manifest`, `installer.nsi`, `README.md`, `README_body.txt`, `CHANGELOG.md` must all say the same version).
+- Version: **v1.4.1** (`main.go`, `app.rc`, `app.manifest`, `installer.nsi`, `README.md`, `README_body.txt`, `CHANGELOG.md` must all say the same version).
 - Tags (`v1.x.y`) are created by the maintainer after the code is committed. CI builds `Lumistar.exe` and `Lumistar-Setup.exe` from the tag and attaches them with `SHA256SUMS.txt`.
 - The program is Go (standard library only), a Windows resource file and an NSIS installer.
 
@@ -26,6 +26,8 @@ Read this file first, then `CHANGELOG.md` and `README.md`.
 ## Source map
 - `main.go`: the whole UI, Win32 calls, themes, the language table (`langs`, `strs`), the help page, settings, the release line. Text shown to users lives in `strs`, one column per language; the last column is `enus`. Missing entries fall back to Russian for the languages in `russianFallback`, otherwise to English.
 - `internal_display.go`: built-in brightness through WMI (`ROOT\WMI`) via COM, plus `brightLog` for diagnostics. A failure is written to `brightness.log` only on a PC that has a battery.
+- `keyboard.go`: keyboard navigation, global hotkeys (`RegisterHotKey`), the display selection and the brightness steps.
+- `mic.go`: the microphone lock (button, saved level, 1.5 s guard).
 - `datafiles.go`: the files written to the data folder on every start (see below).
 - `app.rc`, `app.manifest`: version resource, icons (IDs 1 default, 2 Black Fading to White, 3 White Fading to Black, 4 Black Light), manifest.
 - `installer.nsi`, `README_body.txt`: the installer and the README copied next to the installed program.
