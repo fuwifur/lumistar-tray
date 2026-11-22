@@ -5,8 +5,8 @@
 1 24 "app.manifest"
 
 1 VERSIONINFO
-FILEVERSION 1,4,2,0
-PRODUCTVERSION 1,4,2,0
+FILEVERSION 1,4,5,0
+PRODUCTVERSION 1,4,5,0
 FILEFLAGSMASK 0x3fL
 FILEFLAGS 0x0L
 FILEOS 0x40004L
@@ -19,12 +19,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "fuwifur"
             VALUE "FileDescription", "Lumistar - tray brightness, volume and screen control"
-            VALUE "FileVersion", "1.4.2.0"
+            VALUE "FileVersion", "1.4.5.0"
             VALUE "InternalName", "Lumistar"
             VALUE "LegalCopyright", "Copyright (c) 2026 fuwifur. MIT License."
             VALUE "OriginalFilename", "Lumistar.exe"
             VALUE "ProductName", "Lumistar"
-            VALUE "ProductVersion", "1.4.2"
+            VALUE "ProductVersion", "1.4.5"
         END
     END
     BLOCK "VarFileInfo"

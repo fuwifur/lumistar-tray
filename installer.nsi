@@ -16,7 +16,7 @@ ShowInstDetails nevershow
 !insertmacro GetOptions
 
 !define APPNAME "Lumistar"
-!define VERSION "1.4.2"
+!define VERSION "1.4.5"
 !define UNKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Lumistar"
 !define RUNKEY "Software\Microsoft\Windows\CurrentVersion\Run"
 
@@ -116,7 +116,7 @@ Function OnCustom
 FunctionEnd
 
 Function LocationPage
-  !insertmacro MUI_HEADER_TEXT "Choose install location" "The program goes into the Lumistar folder below. Its settings are always kept in $PROFILE\AppData\LocalLow\fuwifur\Lumistar."
+  !insertmacro MUI_HEADER_TEXT "Choose install location" "The program goes into the Lumistar folder below. Its data is always kept in $PROFILE\AppData\LocalLow\fuwifur\Lumistar."
   nsDialogs::Create 1018
   Pop $0
 
@@ -203,7 +203,7 @@ Function LocationLeave
   ${OrIf} $Choice == 4
     StrCpy $Registered 1
   ${ElseIf} $Choice == 5
-    MessageBox MB_YESNO|MB_ICONQUESTION "Add Lumistar to the Windows list of installed programs?$\r$\n$\r$\nYES: it can be removed from Settings > Apps and by uninstaller tools.$\r$\nNO: portable copy that is not listed anywhere; remove it by deleting its folder. Your data folder %USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar stays unless you delete it." IDNO custom_portable
+    MessageBox MB_YESNO|MB_ICONQUESTION "Add Lumistar to the Windows list of installed programs?$\r$\n$\r$\nYES: it appears in Settings > Apps and can be removed there or with an uninstaller tool.$\r$\nNO: a portable copy that is not listed anywhere. Remove it by deleting its folder. Your data folder %USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar stays unless you delete it." IDNO custom_portable
     StrCpy $Registered 1
     custom_portable:
   ${EndIf}
@@ -271,7 +271,7 @@ Section "Create Start menu shortcut" SecStart
 SectionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecMain} "The Lumistar program and its README.txt (always installed)."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecMain} "The Lumistar program, with its README.txt and SHA256SUMS.txt (always installed)."
   !insertmacro MUI_DESCRIPTION_TEXT ${SecDesktop} "Adds a Lumistar shortcut to your Desktop."
   !insertmacro MUI_DESCRIPTION_TEXT ${SecStart} "Adds Lumistar to the Start menu."
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

@@ -2,13 +2,13 @@
 
 Lumistar is a small open-source project. Everyone who takes part in it (issues, pull requests, discussions, and any other space) is expected to be respectful and constructive.
 
-## Expected behaviour
+## Expected behavior
 
 - Be kind and patient, especially with people who are new to the project.
 - Give and accept feedback on the work, not on the person.
 - Keep discussions on topic.
 
-## Unacceptable behaviour
+## Unacceptable behavior
 
 - Harassment, insults, or personal attacks.
 - Publishing private information about someone without permission.

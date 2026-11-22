@@ -3,7 +3,7 @@
 Read this file first, then `CHANGELOG.md` and `README.md`.
 
 ## Current state
-- Version: **v1.4.2** (`main.go`, `app.rc`, `app.manifest`, `installer.nsi`, `README.md`, `README_body.txt`, `CHANGELOG.md` must all say the same version).
+- Version: **v1.4.5** (`main.go`, `app.rc`, `app.manifest`, `installer.nsi`, `README.md`, `README_body.txt`, `CHANGELOG.md` must all say the same version).
 - Tags (`v1.x.y`) are created by the maintainer after the code is committed. CI builds `Lumistar.exe` and `Lumistar-Setup.exe` from the tag and attaches them with `SHA256SUMS.txt`.
 - The program is Go (standard library only), a Windows resource file and an NSIS installer.
 
@@ -14,7 +14,7 @@ Read this file first, then `CHANGELOG.md` and `README.md`.
 
 ## Compatibility
 - Target: Windows 10 (22H2) and Windows 11. The manifest declares only this family.
-- Windows 7, 8, 8.1, XP and Vista: not supported. XP and Vista would need the audio code rewritten for the old mixer API and have no WMI brightness; that needs the maintainer's approval first.
+- Windows 7, 8, 8.1, XP and Vista: not supported. XP and Vista would need the audio code rewritten for the old mixer API, and they do not provide the WMI brightness interface. Supporting them needs the maintainer's approval first.
 - Tested by the maintainer on Windows: installing and running the release works, and the panel works.
 - Wine (9.0, Xvfb) was used for smoke tests on Linux only. Wine has no WMI brightness provider, so the built-in brightness does nothing there.
 
@@ -27,7 +27,7 @@ Read this file first, then `CHANGELOG.md` and `README.md`.
 - `main.go`: the whole UI, Win32 calls, themes, the language table (`langs`, `strs`), the help page, settings, the release line. Text shown to users lives in `strs`, one column per language; the last column is `enus`. Missing entries fall back to Russian for the languages in `russianFallback`, otherwise to English.
 - `internal_display.go`: built-in brightness through WMI (`ROOT\WMI`) via COM, plus `brightLog` for diagnostics. A failure is written to `brightness.log` only on a PC that has a battery.
 - `keyboard.go`: keyboard navigation, global hotkeys (`RegisterHotKey`), the display selection and the brightness steps.
-- `mic.go`: the microphone lock (button, saved level, 1.5 s guard).
+- `mic.go`: the microphone mute lock (button and 1.5 s guard). The microphone level is never changed.
 - `datafiles.go`: the files written to the data folder on every start (see below).
 - `app.rc`, `app.manifest`: version resource, icons (IDs 1 default, 2 Black Fading to White, 3 White Fading to Black, 4 Black Light), manifest.
 - `installer.nsi`, `README_body.txt`: the installer and the README copied next to the installed program.
@@ -47,8 +47,8 @@ Read this file first, then `CHANGELOG.md` and `README.md`.
 4. **No MSI.** The installer is NSIS (`.exe`). An MSI would need WiX and a separate installer script.
 5. **Still to check on a real Windows machine:** the built-in brightness on a laptop, the tray icon swap between themes, and the release line size.
 
-## Languages (source bytes, GitHub's language bar)
-Go about 87.6% of all files in the repository (about 92% of code only), NSIS about 4.4%, Python about 1.5% (`make_icons.py`), PowerShell about 0.4% (`build.ps1`), shell about 0.2% (`build.sh`, `pp.sh`), resource file about 0.4%, XML about 0.4%. Markdown and plain text are documentation and are not counted as code.
+## Languages (measured on the repository)
+Code bytes only; documentation and binary assets are excluded: Go 91.48%, NSIS 4.31%, Python 1.43%, YAML 1.19%, PowerShell 0.51%, XML 0.44%, Windows resource (RC) 0.41%, Bash 0.22%, Go modules 0.01%. GitHub's language bar can differ.
 
 ## Rules for changes
 - Keep the code in English. Add user-visible text only to `strs`, and never invent a translation.

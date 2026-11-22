@@ -3,12 +3,13 @@
 ## What Lumistar does
 - Shows a tray icon and a small panel window.
 - Sets display brightness: DDC/CI for external monitors, and WMI (`ROOT\WMI`), called directly over COM, for laptop built-in panels.
+- Registers three global hotkeys with `RegisterHotKey`: Ctrl+Alt+Up, Ctrl+Alt+Down and Ctrl+Alt+M. Windows delivers them only for these combinations.
 - Reads and sets the master volume and mute of the default playback device (Windows Core Audio), and the microphone mute.
 - Keeps the PC awake while "Stay awake" is on (`SetThreadExecutionState`) and locks it when you press Lock (`LockWorkStation`).
 - Opens Windows pages or tools only when you press their button: Sound settings (`ms-settings:sound`) and the screenshot overlay (`ms-screenclip:`). The Help page's links open in your browser.
 - Optionally writes a `Lumistar` value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` when "Launch at start-up" is on, and removes it when it is off.
 - Stores its data (settings, logs) only in `%USERPROFILE%\AppData\LocalLow\fuwifur\Lumistar`.
-- Mutes the default microphone and sets its level to 0 when you press the microphone button. While Lumistar holds the microphone muted, it checks the device every 1.5 seconds and mutes it again if something else unmuted it. Only the microphone button unlocks it.
+- Mutes the default microphone when you press the microphone button. While Lumistar holds the microphone muted, it checks the device every 1.5 seconds and mutes it again if something else unmuted it. Only the microphone button unlocks it.
 - Reads its own `Lumistar.exe` once per start to compute its SHA-256 value, which it writes to `SHA256SUMS.txt` in the data folder. The value is not sent anywhere.
 
 ## Hardening in place
@@ -18,7 +19,7 @@
 
 ## What Lumistar does not do
 - No network connections, no telemetry, no automatic updates, no downloads.
-- No keyboard hooks and no keystroke injection.
+- No keyboard hooks and no keystroke injection. Global hotkeys use `RegisterHotKey`, not a hook.
 - No PowerShell, `cmd` or other hidden command-line processes.
 - No services, scheduled tasks or drivers.
 - No administrator rights: the program runs as the current user. The installer asks for administrator rights only when you choose Program Files.
